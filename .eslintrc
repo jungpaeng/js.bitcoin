@@ -5,6 +5,7 @@
   "extends": "airbnb-base",
   "plugins": ["import"],
   "rules": {
-    "linebreak-style": 0
+    "linebreak-style": 0,
+    "max-len": 0
   }
 }
