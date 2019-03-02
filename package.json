@@ -1,0 +1,10 @@
+{
+  "name": "js.bitcoin",
+  "version": "1.0.0",
+  "description": "Clone Bitcoin, main in NodeJS",
+  "main": "src/server.js",
+  "repository": "https://github.com/jungpaeng/js.bitcoin.git",
+  "author": "jungpaeng",
+  "license": "MIT",
+  "private": false
+}
