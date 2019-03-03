@@ -24,7 +24,16 @@ const getLastBlock = () => blockChain[blockChain.length - 1];
 
 const getTimeStamp = () => new Date().getTime();
 
-const createHash = (index, prevHash, timeStamp, data) => CryptoJS.SHA256(index + prevHash + timeStamp + data).toString();
+const createHash = (index, prevHash, timeStamp, data) => (
+  CryptoJS.SHA256(
+    index
+    + prevHash
+    + timeStamp
+    + typeof data === 'string'
+      ? data
+      : JSON.stringify(data),
+  ).toString()
+);
 
 const createNewBlock = (data) => {
   const prevBlock = getLastBlock();
@@ -58,3 +67,11 @@ const isNewBlockValid = (candidateBlock, latestBlock) => {
   }
   return true;
 };
+
+const isNewStructureValid = block => (
+  typeof block.index === 'number'
+  && typeof block.hash === 'string'
+  && typeof block.prevHash === 'string'
+  && typeof block.timeStamp === 'number'
+  && typeof block.data === 'string'
+);
