@@ -11,4 +11,15 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(morgan('combined'));
+
+app.get('/block', (req, res) => {
+  res.send(getBlockChain());
+});
+
+app.post('/block', (req, res) => {
+  const { body: { data } } = req;
+  const newBlock = createNewBlock(data);
+  res.send(newBlock);
+});
+
 app.listen(PORT, () => console.log(`Coin Server running on ${PORT}`));
