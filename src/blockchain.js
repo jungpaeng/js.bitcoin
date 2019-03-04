@@ -26,16 +26,14 @@ const getLastBlock = () => blockChain[blockChain.length - 1];
 
 const getTimeStamp = () => new Date().getTime();
 
-const createHash = (index, prevHash, timeStamp, data) => (
-  CryptoJS.SHA256(
-    index
-      + prevHash
-      + timeStamp
-      + typeof data === 'string'
-      ? data
-      : JSON.stringify(data),
-  ).toString()
-);
+const createHash = (index, prevHash, timeStamp, data) => CryptoJS.SHA256(
+  index
+  + prevHash
+  + timeStamp
+  + (typeof data === 'string'
+    ? data
+    : JSON.stringify(data)),
+).toString();
 
 const getBlockHash = block => createHash(block.indesx, block.prevHash, block.timeStamp, block.data);
 
