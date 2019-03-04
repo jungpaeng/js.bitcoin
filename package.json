@@ -18,5 +18,8 @@
   },
   "devDependencies": {
     "prettier-eslint": "^8.8.2"
+  },
+  "scripts": {
+    "dev": "nodemon src/server.js"
   }
 }
