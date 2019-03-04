@@ -37,21 +37,6 @@ const createHash = (index, prevHash, timeStamp, data) => (
   ).toString()
 );
 
-const createNewBlock = (data) => {
-  const prevBlock = getLastBlock();
-  const newBlockIndex = prevBlock.index + 1;
-  const newTimeStamp = getTimeStamp();
-  const newHash = createHash(newBlockIndex, prevBlock.hash, newTimeStamp, data);
-  const newBlock = new Block(
-    newBlockIndex,
-    newHash,
-    prevBlock.hash,
-    newTimeStamp,
-    data,
-  );
-  return newBlock;
-};
-
 const getBlockHash = block => createHash(block.indesx, block.prevHash, block.timeStamp, block.data);
 
 const isNewStructureValid = block => (
@@ -113,4 +98,25 @@ const addBlockToChain = (candidateBlock) => {
     return true;
   }
   return false;
+};
+
+const createNewBlock = (data) => {
+  const prevBlock = getLastBlock();
+  const newBlockIndex = prevBlock.index + 1;
+  const newTimeStamp = getTimeStamp();
+  const newHash = createHash(newBlockIndex, prevBlock.hash, newTimeStamp, data);
+  const newBlock = new Block(
+    newBlockIndex,
+    newHash,
+    prevBlock.hash,
+    newTimeStamp,
+    data,
+  );
+  addBlockToChain(newBlock);
+  return newBlock;
+};
+
+module.exports = {
+  getBlockChain,
+  createNewBlock,
 };
