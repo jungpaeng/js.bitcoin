@@ -5,7 +5,7 @@ const BlockChain = require('./blockchain');
 
 const { getBlockChain, createNewBlock } = BlockChain;
 
-const PORT = 3000;
+const PORT = process.env.HTTP_PORT || 3000;
 
 const app = express();
 
