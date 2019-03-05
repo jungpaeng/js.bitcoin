@@ -4,16 +4,22 @@ const sockets = [];
 
 const getSockets = () => sockets;
 
+const initSocketConnection = (socket) => {
+  sockets.push(socket);
+  socket.on('message', (data) => {
+    console.log(data);
+  });
+  setTimeout(() => {
+    socket.send('welcone');
+  }, 3000);
+};
+
 const startP2PServer = (server) => {
   const wsServer = new WebSockets.Server({ server });
   wsServer.on('connection', (ws) => {
-    console.log('hello ws');
+    initSocketConnection(ws);
   });
   console.log('Coin P2P Server running!');
-};
-
-const initSocketConnection = (socket) => {
-  sockets.push(socket);
 };
 
 const connectToPeers = (newPeer) => {
