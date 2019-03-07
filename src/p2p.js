@@ -1,7 +1,9 @@
 const WebSockets = require('ws');
 const BlockCahin = require('./blockchain');
 
-const { getLastBlock } = BlockCahin;
+const {
+  getNewestBlock, isStructureValid, addBlockToChain, replaceChain,
+} = BlockCahin;
 
 const sockets = [];
 
@@ -39,6 +41,32 @@ const parseData = (data) => {
 
 const sendMessage = (ws, message) => ws.send(JSON.stringify(message));
 
+const responseLatest = () => blockchainResponse([getNewestBlock()]);
+
+const handleBlockChainResponse = (receivedBlocks) => {
+  if (receivedBlocks.length === 0) {
+    console.log('Received blocks have a length of 0');
+    return null;
+  }
+  const latestBlockReceived = receivedBlocks[receivedBlocks.length - 1];
+  if (!isStructureValid(latestBlockReceived)) {
+    console.log('The block structure of the block received is not valid');
+    return null;
+  }
+  const newestBlock = getNewestBlock();
+  if (latestBlockReceived.index > newestBlock.index) {
+    if (latestBlockReceived.prevHash === newestBlock.hash) {
+      addBlockToChain(latestBlockReceived);
+    } else if (receivedBlocks.length === 1) {
+      // TODO: get all the blocks
+    } else {
+      console.log('FA');
+      replaceChain(latestBlockReceived);
+    }
+  }
+  return null;
+};
+
 const handleSocketMessages = (ws) => {
   ws.on('message', (data) => {
     const message = parseData(data);
@@ -48,7 +76,16 @@ const handleSocketMessages = (ws) => {
     console.log(message);
     switch (message.type) {
       case GET_LASTEST:
-        sendMessage(ws, getLastBlock());
+        sendMessage(ws, responseLatest());
+        break;
+      case BLOCKCHAIN_RESPONSE:
+        {
+          const receivedBlocks = message.data;
+          if (receivedBlocks === null) {
+            break;
+          }
+          handleBlockChainResponse(receivedBlocks);
+        }
         break;
       default:
         return null;

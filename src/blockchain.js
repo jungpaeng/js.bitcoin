@@ -122,4 +122,6 @@ module.exports = {
   getNewestBlock,
   createNewBlock,
   isStructureValid,
+  addBlockToChain,
+  replaceChain,
 };
