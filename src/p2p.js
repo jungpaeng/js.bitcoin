@@ -47,6 +47,8 @@ const responseLatest = () => blockchainResponse([getNewestBlock()]);
 
 const responseAll = () => blockchainResponse(getBlockChain());
 
+const broadcastNewBlock = () => sendMessageToAll(responseLatest());
+
 const handleBlockChainResponse = (receivedBlocks) => {
   if (receivedBlocks.length === 0) {
     console.log('Received blocks have a length of 0');
@@ -60,7 +62,9 @@ const handleBlockChainResponse = (receivedBlocks) => {
   const newestBlock = getNewestBlock();
   if (latestBlockReceived.index > newestBlock.index) {
     if (latestBlockReceived.prevHash === newestBlock.hash) {
-      addBlockToChain(latestBlockReceived);
+      if (addBlockToChain(latestBlockReceived)) {
+        broadcastNewBlock();
+      }
     } else if (receivedBlocks.length === 1) {
       sendMessageToAll(getAll());
     } else {
@@ -133,4 +137,5 @@ const connectToPeers = (newPeer) => {
 module.exports = {
   startP2PServer,
   connectToPeers,
+  broadcastNewBlock,
 };
