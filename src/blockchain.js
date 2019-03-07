@@ -116,5 +116,6 @@ const createNewBlock = (data) => {
 
 module.exports = {
   getBlockChain,
+  getLastBlock,
   createNewBlock,
 };
