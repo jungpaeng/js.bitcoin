@@ -28,8 +28,33 @@ const blockchainResponse = data => ({
 
 const getSockets = () => sockets;
 
+const parseData = (data) => {
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    console.eror(e);
+    return null;
+  }
+};
+
+const sendMessage = (ws, message) => ws.send(JSON.stringify(message));
+
 const handleSocketMessages = (ws) => {
-  ws.on('message', (data) => {});
+  ws.on('message', (data) => {
+    const message = parseData(data);
+    if (message === null) {
+      return null;
+    }
+    console.log(message);
+    switch (message.type) {
+      case GET_LASTEST:
+        sendMessage(ws, getLastBlock());
+        break;
+      default:
+        return null;
+    }
+    return null;
+  });
 };
 
 const handleSocketError = (ws) => {
@@ -44,6 +69,7 @@ const initSocketConnection = (ws) => {
   sockets.push(ws);
   handleSocketMessages(ws);
   handleSocketError(ws);
+  sendMessage(ws, getLatest());
 };
 
 const startP2PServer = (server) => {
