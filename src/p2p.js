@@ -12,15 +12,9 @@ const handleSocketError = (ws) => {
   ws.on('error', () => closeSocketConnection(ws));
 };
 
-const initSocketConnection = (socket) => {
-  sockets.push(socket);
-  handleSocketError(socket);
-  socket.on('message', (data) => {
-    console.log(data);
-  });
-  setTimeout(() => {
-    socket.send('welcone');
-  }, 3000);
+const initSocketConnection = (ws) => {
+  sockets.push(ws);
+  handleSocketError(ws);
 };
 
 const startP2PServer = (server) => {
