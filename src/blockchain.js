@@ -1,6 +1,9 @@
 const CryptoJS = require('crypto-js');
 const hexToBinary = require('hex-to-binary');
 
+const BLOCK_GENERATION_INTERVAL = 10;
+const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
+
 class Block {
   constructor(index, hash, prevHash, timeStamp, data, difficulty, nonce) {
     this.index = index;
@@ -29,7 +32,7 @@ const getBlockChain = () => blockChain;
 
 const getNewestBlock = () => blockChain[blockChain.length - 1];
 
-const getTimeStamp = () => new Date().getTime();
+const getTimeStamp = () => new Date().getTime() / 1000;
 
 const createHash = (index, prevHash, timeStamp, data, difficulty, nonce) => CryptoJS.SHA256(
   index
@@ -68,6 +71,8 @@ const getBlockHash = block => createHash(
   block.prevHash,
   block.timeStamp,
   block.data,
+  block.difficulty,
+  block.nonce,
 );
 
 const isStructureValid = block => (
@@ -131,16 +136,39 @@ const addBlockToChain = (candidateBlock) => {
   return false;
 };
 
+const calculateNewDifficulty = (newestBlock, blockChain) => {
+  const lastCalculatedBlock = blockChain[blockChain.length - DIFFICULTY_ADJUSMENT_INTERVAL];
+  const timeExpected = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSMENT_INTERVAL;
+  const timeTaken = newestBlock.timeStamp - lastCalculatedBlock.timeStamp;
+  if (timeTaken > timeExpected / 2) {
+    return lastCalculatedBlock.difficulty - 1;
+  }
+  if (timeTaken < timeExpected / 2) {
+    return lastCalculatedBlock.difficulty + 1;
+  }
+  return lastCalculatedBlock.difficulty;
+};
+
+const findDifficulty = () => {
+  const newestBlock = getNewestBlock();
+
+  if (newestBlock.index % DIFFICULTY_ADJUSMENT_INTERVAL === 0 && newestBlock.index !== 0) {
+    return calculateNewDifficulty(newestBlock, getBlockChain());
+  }
+  return newestBlock.difficulty;
+};
+
 const createNewBlock = (data) => {
   const prevBlock = getNewestBlock();
   const newBlockIndex = prevBlock.index + 1;
   const newTimeStamp = getTimeStamp();
+  const difficulty = findDifficulty();
   const newBlock = findBlock(
     newBlockIndex,
     prevBlock.hash,
     newTimeStamp,
     data,
-    12,
+    difficulty,
   );
   addBlockToChain(newBlock);
   require('./p2p').broadcastNewBlock();
