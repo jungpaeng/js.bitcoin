@@ -30,12 +30,15 @@ const createHash = (index, prevHash, timeStamp, data) => CryptoJS.SHA256(
   index
   + prevHash
   + timeStamp
-  + (typeof data === 'string'
-    ? data
-    : JSON.stringify(data)),
+  + (typeof data === 'string' ? data : JSON.stringify(data)),
 ).toString();
 
-const getBlockHash = block => createHash(block.indesx, block.prevHash, block.timeStamp, block.data);
+const getBlockHash = block => createHash(
+  block.index,
+  block.prevHash,
+  block.timeStamp,
+  block.data,
+);
 
 const isNewStructureValid = block => (
   typeof block.index === 'number'
