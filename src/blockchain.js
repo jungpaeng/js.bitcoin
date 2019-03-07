@@ -1,12 +1,15 @@
 const CryptoJS = require('crypto-js');
+const hexToBinary = require('hex-to-binary');
 
 class Block {
-  constructor(index, hash, prevHash, timeStamp, data) {
+  constructor(index, hash, prevHash, timeStamp, data, difficulty, nonce) {
     this.index = index;
     this.hash = hash;
     this.prevHash = prevHash;
     this.timeStamp = timeStamp;
     this.data = data;
+    this.difficulty = difficulty;
+    this.nonce = nonce;
   }
 }
 
@@ -16,6 +19,8 @@ const genesisBlock = new Block(
   null,
   1551548467767,
   'Genesis Block',
+  0,
+  0,
 );
 
 let blockChain = [genesisBlock];
@@ -26,12 +31,37 @@ const getNewestBlock = () => blockChain[blockChain.length - 1];
 
 const getTimeStamp = () => new Date().getTime();
 
-const createHash = (index, prevHash, timeStamp, data) => CryptoJS.SHA256(
+const createHash = (index, prevHash, timeStamp, data, difficulty, nonce) => CryptoJS.SHA256(
   index
   + prevHash
   + timeStamp
-  + (typeof data === 'string' ? data : JSON.stringify(data)),
+  + (typeof data === 'string' ? data : JSON.stringify(data))
+  + difficulty
+  + nonce,
 ).toString();
+
+const hashMatchedDifficulty = (hash, difficulty) => {
+  const hashInBinary = hexToBinary(hash);
+  const requiredZeros = '0'.repeat(difficulty);
+  console.log('Trying difficulty: ', difficulty, 'with hash', hexToBinary(hash));
+  return hashInBinary.startsWith(requiredZeros);
+};
+
+const findBlock = (index, prevHash, timeStamp, data, difficulty) => {
+  let nonce = 0;
+  while (true) {
+    console.log('Current nonce', nonce);
+    const hash = createHash(
+      index, prevHash, timeStamp, data, difficulty, nonce,
+    );
+    if (hashMatchedDifficulty(hash, difficulty)) {
+      return new Block(
+        index, hash, prevHash, timeStamp, data, difficulty, nonce,
+      );
+    }
+    nonce += 1;
+  }
+};
 
 const getBlockHash = block => createHash(
   block.index,
@@ -105,13 +135,12 @@ const createNewBlock = (data) => {
   const prevBlock = getNewestBlock();
   const newBlockIndex = prevBlock.index + 1;
   const newTimeStamp = getTimeStamp();
-  const newHash = createHash(newBlockIndex, prevBlock.hash, newTimeStamp, data);
-  const newBlock = new Block(
+  const newBlock = findBlock(
     newBlockIndex,
-    newHash,
     prevBlock.hash,
     newTimeStamp,
     data,
+    12,
   );
   addBlockToChain(newBlock);
   require('./p2p').broadcastNewBlock();
