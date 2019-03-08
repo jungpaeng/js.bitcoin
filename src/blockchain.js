@@ -20,7 +20,7 @@ const genesisBlock = new Block(
   0,
   '51C46352EC462B51BB5B5BB6DA3B90496E2F88030AB1861B32109E2EDF8DC7D2',
   null,
-  1551548467767,
+  1552058917,
   'Genesis Block',
   0,
   0,
@@ -32,7 +32,7 @@ const getBlockChain = () => blockChain;
 
 const getNewestBlock = () => blockChain[blockChain.length - 1];
 
-const getTimeStamp = () => new Date().getTime() / 1000;
+const getTimeStamp = () => Math.round(new Date().getTime() / 1000);
 
 const createHash = (index, prevHash, timeStamp, data, difficulty, nonce) => CryptoJS.SHA256(
   index
@@ -83,6 +83,10 @@ const isStructureValid = block => (
   && typeof block.data === 'string'
 );
 
+const isTimeStampValid = (newBlock, oldBlock) => (
+  oldBlock.timeStamp - 60 < newBlock.timeStamp
+  && newBlock.timeStamp - 60 < getTimeStamp()
+);
 
 const isBlockValid = (candidateBlock, latestBlock) => {
   if (!isStructureValid(candidateBlock)) {
@@ -99,6 +103,10 @@ const isBlockValid = (candidateBlock, latestBlock) => {
   }
   if (getBlockHash(candidateBlock) !== candidateBlock.hash) {
     console.error('The hash of the block is invalid');
+    return false;
+  }
+  if (!isTimeStampValid(candidateBlock, latestBlock)) {
+    console.error('The time stamp of this block is doggy');
     return false;
   }
   return true;
