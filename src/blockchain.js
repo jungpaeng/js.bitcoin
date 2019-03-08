@@ -128,8 +128,17 @@ const isChainValid = (candidateChain) => {
   return true;
 };
 
+const sumOfiDifficulty = anyBlockChain => (
+  anyBlockChain
+    .map(block => block.difficulty ** 2)
+    .reduce((prev, curr) => prev + curr)
+);
+
 const replaceChain = (newChain) => {
-  if (isChainValid(newChain) && newChain.length > getBlockChain().length) {
+  if (
+    isChainValid(newChain)
+    && sumOfiDifficulty(newChain) > sumOfiDifficulty(getBlockChain())
+  ) {
     blockChain = newChain;
     return true;
   }
