@@ -2,7 +2,7 @@ const CryptoJS = require('crypto-js');
 const EC = require('elliptic').ec;
 const utils = require('./utils');
 
-const ec = new EC('specp256k1');
+const ec = new EC('secp256k1');
 
 const COINBASE_AMOUNT = 10;
 
