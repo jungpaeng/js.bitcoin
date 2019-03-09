@@ -8,6 +8,7 @@
     "linebreak-style": 0,
     "max-len": 0,
     "no-shadow": 0,
-    "global-require": 0
+    "global-require": 0,
+    "no-bitwise": 0
   }
 }
