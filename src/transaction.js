@@ -48,9 +48,9 @@ const findUTxOut = (txOutId, txOutIndex, uTxOutList) => (
   ))
 );
 
-const signTxIn = (tx, txInIndex, privateKey) => {
+const signTxIn = (tx, txInIndex, privateKey, uTxOutList) => {
   const txIn = tx.txIns[txInIndex];
-  const referenctdUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOuts);
+  const referenctdUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOutList);
   if (referenctdUTxOut === null) { return null; }
   const dataToSign = tx.id;
   const key = ec.keyFromPrivate(privateKey, 'hex');
