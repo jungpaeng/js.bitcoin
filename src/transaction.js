@@ -51,7 +51,9 @@ const findUTxOut = (txOutId, txOutIndex, uTxOutList) => (
 const signTxIn = (tx, txInIndex, privateKey, uTxOutList) => {
   const txIn = tx.txIns[txInIndex];
   const referenctdUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOutList);
-  if (referenctdUTxOut === null) { return null; }
+  if (referenctdUTxOut === null) {
+    return null;
+  }
   const dataToSign = tx.id;
   const key = ec.keyFromPrivate(privateKey, 'hex');
   const signature = utils.toHexString(key.sign(dataToSign).toDER());
@@ -133,7 +135,7 @@ const isTxOutStructureValid = (txOut) => {
 
 const isTxStructureValid = (tx) => {
   if (typeof tx.id !== 'string') {
-    console.error('Tx Id is not valid');
+    console.error('Tx ID is not valid');
     return false;
   }
   if (!(tx.txIns instanceof Array)) {
@@ -169,6 +171,7 @@ const validateTxIn = (txIn, tx, uTxOutList) => {
   );
 
   if (wantedTxOut === null) {
+    console.error(`Didn't find the wanted uTxOut, the tx : ${tx} is invalid`);
     return false;
   }
 
@@ -184,15 +187,18 @@ const getAmountInTxIn = (txIn, uTxOutList) => (
 
 const validateTx = (tx, uTxOutList) => {
   if (!isTxStructureValid(tx)) {
+    console.error('Tx structure is invalid');
     return false;
   }
   if (getTxId(tx) !== tx.id) {
+    console.error('Tx ID is not valid');
     return false;
   }
 
   const hasValidTxIns = tx.txIns.map(txIn => validateTxIn(txIn, tx, uTxOutList));
 
   if (!hasValidTxIns) {
+    console.error(`The tx: ${tx} doesn't have valid txIns`);
     return false;
   }
 
@@ -205,6 +211,7 @@ const validateTx = (tx, uTxOutList) => {
     .reduce((prev, curr) => prev + curr, 0);
 
   if (amountInTxIns !== amountInTxOuts) {
+    console.error(`the tx: ${tx} doesn't have the same amount in the txOut as in the txIns`);
     return false;
   }
 
@@ -213,18 +220,23 @@ const validateTx = (tx, uTxOutList) => {
 
 const validateCoinbaseTx = (tx, blockIndex) => {
   if (getTxId(tx) !== tx.id) {
+    console.error('Invalid Coinbase tx ID');
     return false;
   }
   if (tx.txIns.length !== 1) {
+    console.error('Coinbase TX should only have one input');
     return false;
   }
   if (tx.txIns[0].txOutIndex !== blockIndex) {
+    console.error('The txOutIndex of the Coinbase TX should be the same as the Block Index');
     return false;
   }
   if (tx.txOuts.length !== 1) {
+    console.error('Coinbase TX should only have one output');
     return false;
   }
   if (tx.txOuts[0].amount !== COINBASE_AMOUNT) {
+    console.error(`Coinbase TX should have an amount of only ${COINBASE_AMOUNT} and it has ${tx.txOuts[0].amount}`);
     return false;
   }
 
