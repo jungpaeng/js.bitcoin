@@ -55,3 +55,21 @@ const signTxIn = (tx, txInIndex, privateKey) => {
   const signature = utils.toHexString(key.sign(dataToSign).toDER());
   return signature;
 };
+
+const updateUTxOuts = (newTxs, uTxOutList) => {
+  const newUTxOuts = newTxs
+    .map(tx => (
+      tx.txOuts.map((txOut, index) => (
+        new UTxOut(tx.id, index, txOut.address, txOut.amount)
+      ))
+    ))
+    .reduce((prev, curr) => prev.concat(curr), []);
+  const spentTxOuts = newTxs
+    .map(tx => tx.txIns)
+    .reduce((prev, curr) => prev.concat(curr), [])
+    .map(txIn => new UTxOut(txIn.txOutId, txIn.txOutIndex, '', 0));
+  const resultingUTxOuts = uTxOutList
+    .filter(uTxO => !findUTxOut(uTxO.txOutId, uTxO.txOutIndex, spentTxOuts))
+    .concat(newUTxOuts);
+  return resultingUTxOuts;
+};
