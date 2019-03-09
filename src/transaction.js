@@ -50,8 +50,8 @@ const findUTxOut = (txOutId, txOutIndex, uTxOutList) => (
 
 const signTxIn = (tx, txInIndex, privateKey, uTxOutList) => {
   const txIn = tx.txIns[txInIndex];
-  const referenctdUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOutList);
-  if (referenctdUTxOut === null) {
+  const referencedUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOutList);
+  if (referencedUTxOut === null) {
     return null;
   }
   const dataToSign = tx.id;
