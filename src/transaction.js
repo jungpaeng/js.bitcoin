@@ -138,17 +138,25 @@ const isTxStructureValid = (tx) => {
     console.error('The txIns are not an array');
     return false;
   }
-  // if () {
-  // console.error('The structure of one of the txIn is not valid');
-  // return false;
-  // }
+  if (
+    !tx.txIns
+      .map(isTxInStructureValid)
+      .reduce((prev, curr) => prev && curr, true)
+  ) {
+    console.error('The structure of one of the txIn is not valid');
+    return false;
+  }
   if (!(tx.txOuts instanceof Array)) {
     console.error('The txOuts are not an array');
     return false;
   }
-  // if () {
-  // console.error('The structure of one of the txOut is not valid');
-  // return false;
-  // }
+  if (
+    !tx.txOuts
+      .map(isTxOutStructureValid)
+      .reduce((prev, curr) => prev && curr, true)
+  ) {
+    console.error('The structure of one of the txOut is not valid');
+    return false;
+  }
   return true;
 };
