@@ -94,8 +94,39 @@ const isTxInStructureValid = (txIn) => {
   return true;
 };
 
-const isTxOutStructureValid = (txIn) => {
-  // TODO
+const isAddressValid = (address) => {
+  if (address.length !== 130) {
+    console.error('The address length is not the expected one');
+    return false;
+  }
+  if (address.match('^[a-fA-F0-9]+$') === null) {
+    console.error('The address doesn\'t match the hex pattern');
+    return false;
+  }
+  if (!address.startsWith('04')) {
+    console.error('the address doesn\'t start with 04');
+    return false;
+  }
+  return true;
+};
+
+const isTxOutStructureValid = (txOut) => {
+  if (txOut === null) {
+    return false;
+  }
+  if (typeof txOut.address !== 'string') {
+    console.error('The txOut doesn\'t have a valid string as address');
+    return false;
+  }
+  if (!isAddressValid(txOut.address)) {
+    console.error('The txOut doesn\'t have a valid address');
+    return false;
+  }
+  if (typeof txOut.amount !== 'number') {
+    console.error('The txOut doesn\'t have a valid amount');
+    return false;
+  }
+  return true;
 };
 
 const isTxStructureValid = (tx) => {
