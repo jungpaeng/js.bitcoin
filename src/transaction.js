@@ -73,3 +73,35 @@ const updateUTxOuts = (newTxs, uTxOutList) => {
     .concat(newUTxOuts);
   return resultingUTxOuts;
 };
+
+const isTxInStructureValid = (txIn) => {
+  // TODO
+};
+
+const isTxOutStructureValid = (txIn) => {
+  // TODO
+};
+
+const isTxStructureValid = (tx) => {
+  if (typeof tx.id !== 'string') {
+    console.error('Tx Id is not valid');
+    return false;
+  }
+  if (!(tx.txIns instanceof Array)) {
+    console.error('The txIns are not an array');
+    return false;
+  }
+  // if () {
+  // console.error('The structure of one of the txIn is not valid');
+  // return false;
+  // }
+  if (!(tx.txOuts instanceof Array)) {
+    console.error('The txOuts are not an array');
+    return false;
+  }
+  // if () {
+  // console.error('The structure of one of the txOut is not valid');
+  // return false;
+  // }
+  return true;
+};
