@@ -160,3 +160,51 @@ const isTxStructureValid = (tx) => {
   }
   return true;
 };
+
+const validateTxIn = (txIn, tx, uTxOutList) => {
+  const wantedTxOut = uTxOutList.find(
+    uTxOut => uTxOut.txOutId === txIn.txOutId && uTxOut.txOutIndex === txIn.txOutIndex,
+  );
+
+  if (wantedTxOut === null) {
+    return false;
+  }
+
+  const { address } = wantedTxOut;
+  const key = ec.keyFromPublic(address, 'hex');
+
+  return key.verify(tx.id, txIn.signature);
+};
+
+const getAmountInTxIn = (txIn, uTxOutList) => (
+  findUTxOut(txIn.txOutId, txIn.txOutIndex, uTxOutList).amount
+);
+
+const validateTx = (tx, uTxOutList) => {
+  if (!isTxStructureValid(tx)) {
+    return false;
+  }
+  if (getTxId(tx) !== tx.id) {
+    return false;
+  }
+
+  const hasValidTxIns = tx.txIns.map(txIn => validateTxIn(txIn, tx, uTxOutList));
+
+  if (!hasValidTxIns) {
+    return false;
+  }
+
+  const amountInTxIns = tx.txIns
+    .map(txIn => getAmountInTxIn(txIn, uTxOutList))
+    .reduce((prev, curr) => prev + curr, 0);
+
+  const amountInTxOuts = tx.txOuts
+    .map(txOut => txOut.amount)
+    .reduce((prev, curr) => prev + curr, 0);
+
+  if (amountInTxIns !== amountInTxOuts) {
+    return false;
+  }
+
+  return true;
+};
