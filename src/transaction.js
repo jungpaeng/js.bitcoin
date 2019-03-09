@@ -75,7 +75,23 @@ const updateUTxOuts = (newTxs, uTxOutList) => {
 };
 
 const isTxInStructureValid = (txIn) => {
-  // TODO
+  if (txIn === null) {
+    console.error('The txIn appears to be null');
+    return false;
+  }
+  if (typeof txIn.signature !== 'string') {
+    console.error('The txIn doesn\'t have a valid signature');
+    return false;
+  }
+  if (typeof txIn.txOutId !== 'string') {
+    console.error('The txIn doesn\'t have a valid txOutId');
+    return false;
+  }
+  if (typeof txIn.txOutIndex !== 'number') {
+    console.error('The txIn doesn\'t have a valid txOutIndex');
+    return false;
+  }
+  return true;
 };
 
 const isTxOutStructureValid = (txIn) => {
