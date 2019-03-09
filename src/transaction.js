@@ -4,6 +4,8 @@ const utils = require('./utils');
 
 const ec = new EC('specp256k1');
 
+const COINBASE_AMOUNT = 10;
+
 class TxIn {
   // TODO: uTxOutId, uTxOutIndex, Signature
 }
@@ -203,6 +205,26 @@ const validateTx = (tx, uTxOutList) => {
     .reduce((prev, curr) => prev + curr, 0);
 
   if (amountInTxIns !== amountInTxOuts) {
+    return false;
+  }
+
+  return true;
+};
+
+const validateCoinbaseTx = (tx, blockIndex) => {
+  if (getTxId(tx) !== tx.id) {
+    return false;
+  }
+  if (tx.txIns.length !== 1) {
+    return false;
+  }
+  if (tx.txIns[0].txOutIndex !== blockIndex) {
+    return false;
+  }
+  if (tx.txOuts.length !== 1) {
+    return false;
+  }
+  if (tx.txOuts[0].amount !== COINBASE_AMOUNT) {
     return false;
   }
 
