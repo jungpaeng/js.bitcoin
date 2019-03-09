@@ -3,9 +3,11 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const BlockChain = require('./blockchain');
 const P2P = require('./p2p');
+const Wallet = require('./wallet');
 
 const { getBlockChain, createNewBlock } = BlockChain;
 const { startP2PServer, connectToPeers } = P2P;
+const { initWallet } = Wallet;
 
 const PORT = process.env.HTTP_PORT || 3000;
 
@@ -34,4 +36,5 @@ const server = app.listen(PORT, () => {
   console.log(`Coin Server running on ${PORT}`);
 });
 
+initWallet();
 startP2PServer(server);
