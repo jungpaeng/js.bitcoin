@@ -1,9 +1,16 @@
 const WebSockets = require('ws');
 const BlockCahin = require('./blockchain');
+const Mempool = require('./mempool');
 
 const {
-  getBlockChain, getNewestBlock, isStructureValid, addBlockToChain, replaceChain,
+  getBlockChain,
+  getNewestBlock,
+  isStructureValid,
+  addBlockToChain,
+  replaceChain,
+  handleIncomingTx,
 } = BlockCahin;
+const { getMempool } = Mempool;
 
 const sockets = [];
 
@@ -11,6 +18,8 @@ const sockets = [];
 const GET_LASTEST = 'GET_LASTEST';
 const GET_ALL = 'GET_ALL';
 const BLOCKCHAIN_RESPONSE = 'BLOCKCHAIN_RESPONSE';
+const REQUEST_MEMPOOL = 'REQUEST_MEMPOOL';
+const MEMPOOL_RESPONSE = 'MEMPOOL_RESPONSE';
 
 // Message Creators
 const getLatest = () => ({
@@ -25,6 +34,16 @@ const getAll = () => ({
 
 const blockchainResponse = data => ({
   type: BLOCKCHAIN_RESPONSE,
+  data,
+});
+
+const getAllMempool = () => ({
+  type: REQUEST_MEMPOOL,
+  data: null,
+});
+
+const mempoolResponse = data => ({
+  type: MEMPOOL_RESPONSE,
   data,
 });
 
@@ -48,6 +67,10 @@ const responseLatest = () => blockchainResponse([getNewestBlock()]);
 const responseAll = () => blockchainResponse(getBlockChain());
 
 const broadcastNewBlock = () => sendMessageToAll(responseLatest());
+
+const returnMempool = () => mempoolResponse(getMempool());
+
+const broadcastMempool = () => sendMessageToAll(returnMempool());
 
 const handleBlockChainResponse = (receivedBlocks) => {
   if (receivedBlocks.length === 0) {
@@ -80,7 +103,6 @@ const handleSocketMessages = (ws) => {
     if (message === null) {
       return null;
     }
-    console.log(message);
     switch (message.type) {
       case GET_LASTEST:
         sendMessage(ws, responseLatest());
@@ -95,6 +117,24 @@ const handleSocketMessages = (ws) => {
             break;
           }
           handleBlockChainResponse(receivedBlocks);
+        }
+        break;
+      case REQUEST_MEMPOOL:
+        sendMessage(ws, returnMempool());
+        break;
+      case MEMPOOL_RESPONSE:
+        {
+          const receivedTxs = message.data;
+          if (receivedTxs === null) {
+            return null;
+          }
+          receivedTxs.forEach((tx) => {
+            try {
+              handleIncomingTx(tx);
+            } catch (e) {
+              console.error(e);
+            }
+          });
         }
         break;
       default:
@@ -117,12 +157,18 @@ const initSocketConnection = (ws) => {
   handleSocketMessages(ws);
   handleSocketError(ws);
   sendMessage(ws, getLatest());
+  setTimeout(() => {
+    sendMessage(ws, getAllMempool());
+  }, 1000);
 };
 
 const startP2PServer = (server) => {
   const wsServer = new WebSockets.Server({ server });
   wsServer.on('connection', (ws) => {
     initSocketConnection(ws);
+  });
+  wsServer.on('error', () => {
+    console.error('error');
   });
   console.log('Coin P2P Server running!');
 };
@@ -138,4 +184,5 @@ module.exports = {
   startP2PServer,
   connectToPeers,
   broadcastNewBlock,
+  broadcastMempool,
 };

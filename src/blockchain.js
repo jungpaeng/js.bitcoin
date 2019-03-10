@@ -236,7 +236,12 @@ const sendTx = (address, amount) => {
   const uTxOutList = getUTxOutList();
   const tx = createTx(address, amount, getPrivateFromWallet(), uTxOutList, getMempool());
   addToMempool(tx, uTxOutList);
+  require('./p2p').broadcastMempool();
   return tx;
+};
+
+const handleIncomingTx = (tx) => {
+  addToMempool(tx, getUTxOutList());
 };
 
 module.exports = {
@@ -248,4 +253,5 @@ module.exports = {
   replaceChain,
   getAccountBalance,
   sendTx,
+  handleIncomingTx,
 };
