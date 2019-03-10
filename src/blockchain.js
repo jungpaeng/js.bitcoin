@@ -1,10 +1,15 @@
 const CryptoJS = require('crypto-js');
 const hexToBinary = require('hex-to-binary');
+const _ = require('lodash');
 const Wallet = require('./wallet');
 const Transaction = require('./transaction');
+const Mempool = require('./mempool');
 
-const { getBalance, getPublicFromWallet } = Wallet;
+const {
+  getBalance, getPublicFromWallet, getPrivateFromWallet, createTx,
+} = Wallet;
 const { createCoinbaseTx, processTxs } = Transaction;
+const { addToMempool } = Mempool;
 
 const BLOCK_GENERATION_INTERVAL = 10;
 const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
@@ -34,6 +39,8 @@ const genesisBlock = new Block(
 let blockChain = [genesisBlock];
 
 let uTxOuts = [];
+
+const getUTxOutList = () => _.cloneDeep(uTxOuts);
 
 const getBlockChain = () => blockChain;
 
@@ -212,6 +219,12 @@ const createNewBlock = () => {
 };
 
 const getAccountBalance = () => getBalance(getPublicFromWallet(), uTxOuts);
+
+const sendTx = (address, amount) => {
+  const uTxOutList = getUTxOutList();
+  const tx = createTx(address, amount, getPrivateFromWallet(), uTxOutList);
+  addToMempool(tx, uTxOutList);
+};
 
 module.exports = {
   getBlockChain,

@@ -97,4 +97,6 @@ module.exports = {
   initWallet,
   getBalance,
   getPublicFromWallet,
+  getPrivateFromWallet,
+  createTx,
 };
