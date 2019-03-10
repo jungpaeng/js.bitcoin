@@ -315,4 +315,5 @@ module.exports = {
   signTxIn,
   createCoinbaseTx,
   processTxs,
+  validateTx,
 };
