@@ -222,7 +222,7 @@ const getAccountBalance = () => getBalance(getPublicFromWallet(), uTxOuts);
 
 const sendTx = (address, amount) => {
   const uTxOutList = getUTxOutList();
-  const tx = createTx(address, amount, getPrivateFromWallet(), uTxOutList);
+  const tx = createTx(address, amount, getPrivateFromWallet(), uTxOutList, getMempool());
   addToMempool(tx, uTxOutList);
   return tx;
 };
