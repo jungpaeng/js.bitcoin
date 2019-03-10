@@ -10,7 +10,7 @@ const {
   getBlockChain, createNewBlock, getAccountBalance, sendTx,
 } = BlockChain;
 const { startP2PServer, connectToPeers } = P2P;
-const { initWallet } = Wallet;
+const { initWallet, getPublicFromWallet } = Wallet;
 const { getMempool } = Mempool;
 
 const PORT = process.env.HTTP_PORT || 3000;
@@ -33,6 +33,10 @@ app.post('/peers', (req, res) => {
   const { body: { peer } } = req;
   connectToPeers(peer);
   res.send();
+});
+
+app.get('/me/address', (req, res) => {
+  res.send(getPublicFromWallet());
 });
 
 app.get('/me/balance', (req, res) => {
