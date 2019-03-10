@@ -26,19 +26,30 @@ class Block {
   }
 }
 
+const genesisTx = {
+  txIns: [{ signature: '', txOutId: '', txOutIndex: 0 }],
+  txOuts: [
+    {
+      address: '042c08776955fc93c81bf4aa2e67337142ff35a6925f278c31ba1e66291774e75a61b376a85e78ebac31b177e711c2a6814c141ba6b56a048eab54a3f53b6f0a4d',
+      amount: 10,
+    },
+  ],
+  id: 'f58de87ffc6b9035ccca4fd271c302e0fcba55dfb96815134bf5f628e4a2193a',
+};
+
 const genesisBlock = new Block(
   0,
-  '51C46352EC462B51BB5B5BB6DA3B90496E2F88030AB1861B32109E2EDF8DC7D2',
+  '33156b8dcba9314966c2cbd5578d1f646bafc6da42ba6cc35c9f1aa019e01802',
   null,
   1552058917,
-  'Genesis Block',
+  [genesisTx],
   0,
   0,
 );
 
 let blockChain = [genesisBlock];
 
-let uTxOuts = [];
+let uTxOuts = processTxs(blockChain[0].data, [], 0);
 
 const getUTxOutList = () => _.cloneDeep(uTxOuts);
 
