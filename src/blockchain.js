@@ -1,5 +1,8 @@
 const CryptoJS = require('crypto-js');
 const hexToBinary = require('hex-to-binary');
+const Wallet = require('./wallet');
+
+const { getBalance, getPublicFromWallet } = Wallet;
 
 const BLOCK_GENERATION_INTERVAL = 10;
 const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
@@ -27,6 +30,8 @@ const genesisBlock = new Block(
 );
 
 let blockChain = [genesisBlock];
+
+const uTxOuts = [];
 
 const getBlockChain = () => blockChain;
 
@@ -192,6 +197,8 @@ const createNewBlock = (data) => {
   return newBlock;
 };
 
+const getAccountBalance = () => getBalance(getPublicFromWallet(), uTxOuts);
+
 module.exports = {
   getBlockChain,
   getNewestBlock,
@@ -199,4 +206,5 @@ module.exports = {
   isStructureValid,
   addBlockToChain,
   replaceChain,
+  getAccountBalance,
 };
