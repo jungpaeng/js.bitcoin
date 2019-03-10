@@ -3,7 +3,7 @@ const Transaction = require('./transaction');
 
 const { validateTx } = Transaction;
 
-const mempool = [];
+let mempool = [];
 
 const getMempool = () => _.cloneDeep(mempool);
 
@@ -28,6 +28,33 @@ const isTxValidForPool = (tx, mempool) => {
   ));
 };
 
+const hasTxIn = (txIn, uTxOutList) => {
+  const foundTxIn = uTxOutList.find(uTxO => (
+    uTxO.txOutId === txIn.txOutId
+    && uTxO.txOutIndex === txIn.txOutIndex
+  ));
+
+  return foundTxIn !== undefined;
+};
+
+const updateMempool = (uTxOutList) => {
+  const invalidTxs = [];
+
+  mempool.forEach((tx) => {
+    tx.txIns.some((txIn) => {
+      if (!hasTxIn(txIn, uTxOutList)) {
+        invalidTxs.push(tx);
+        return true;
+      }
+      return false;
+    });
+  });
+
+  if (invalidTxs.length > 0) {
+    mempool = _.without(mempool, ...invalidTxs);
+  }
+};
+
 const addToMempool = (tx, uTxOutList) => {
   if (!validateTx(tx, uTxOutList)) {
     throw Error('This tx is invalid. Will not add it to pool.');
@@ -40,4 +67,5 @@ const addToMempool = (tx, uTxOutList) => {
 module.exports = {
   addToMempool,
   getMempool,
+  updateMempool,
 };
