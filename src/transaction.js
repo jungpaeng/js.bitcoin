@@ -33,7 +33,7 @@ class UTxOut {
 
 const getTxId = (tx) => {
   const txInContent = tx.txIns
-    .map(txIn => txIn.uTxOutId + txIn.uTxOutIndex)
+    .map(txIn => txIn.txOutId + txIn.txOutIndex)
     .reduce((prev, curr) => prev + curr, '');
   const txOutContent = tx.txOuts
     .map(txOut => txOut.address + txOut.amount)
