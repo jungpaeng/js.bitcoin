@@ -250,6 +250,17 @@ const validateCoinbaseTx = (tx, blockIndex) => {
   return true;
 };
 
+const createCoinbaseTx = (address, blockIndex) => {
+  const tx = new Transaction();
+  const txIn = new TxIn();
+  txIn.signature = '';
+  txIn.txOutId = blockIndex;
+  tx.txIns = [txIn];
+  tx.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
+  tx.id = getTxId(tx);
+  return tx;
+};
+
 module.exports = {
   Transaction,
   TxIn,
@@ -257,4 +268,5 @@ module.exports = {
   getPublicKey,
   getTxId,
   signTxIn,
+  createCoinbaseTx,
 };
