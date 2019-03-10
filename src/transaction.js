@@ -1,4 +1,5 @@
 const CryptoJS = require('crypto-js');
+const _ = require('lodash');
 const EC = require('elliptic').ec;
 const utils = require('./utils');
 
@@ -37,7 +38,7 @@ const getTxId = (tx) => {
   const txOutContent = tx.txOuts
     .map(txOut => txOut.address + txOut.amount)
     .reduce((prev, curr) => prev + curr, '');
-  return CryptoJS.SHA256(txInContent + txOutContent);
+  return CryptoJS.SHA256(txInContent + txOutContent).toString();
 };
 
 const findUTxOut = (txOutId, txOutIndex, uTxOutList) => (
@@ -254,11 +255,55 @@ const createCoinbaseTx = (address, blockIndex) => {
   const tx = new Transaction();
   const txIn = new TxIn();
   txIn.signature = '';
-  txIn.txOutId = blockIndex;
+  txIn.txOutId = '';
+  txIn.txOutIndex = blockIndex;
   tx.txIns = [txIn];
   tx.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
   tx.id = getTxId(tx);
   return tx;
+};
+
+const hasDuplicates = (txIns) => {
+  const groups = _.countBy(txIns, txIn => txIn.txOutId + txIn.txOutIndex);
+
+  return _(groups)
+    .map((value) => {
+      if (value > 1) {
+        console.error('Found a duplicated txIn');
+        return true;
+      }
+      return false;
+    })
+    .includes(true);
+};
+
+const validateBlockTxs = (txs, uTxOutList, blockIndex) => {
+  const coinbaseTx = txs[0];
+  if (!validateCoinbaseTx(coinbaseTx, blockIndex)) {
+    console.error('Coinbase Tx is invalid');
+  }
+
+  const txIns = _(txs)
+    .map(tx => tx.txIns)
+    .flatten()
+    .value();
+
+  if (hasDuplicates(txIns)) {
+    console.error('Found duplicated txIns');
+    return false;
+  }
+
+  const nonCoinbaseTxs = txs.slice(1);
+  return nonCoinbaseTxs
+    .map(tx => validateTx(tx, uTxOutList))
+    .reduce((prev, curr) => prev + curr, true);
+};
+
+const processTxs = (txs, uTxOutList, blockIndex) => {
+  if (!validateBlockTxs(txs, uTxOutList, blockIndex)) {
+    return null;
+  }
+  return updateUTxOuts(txs, uTxOutList);
 };
 
 module.exports = {
@@ -269,4 +314,5 @@ module.exports = {
   getTxId,
   signTxIn,
   createCoinbaseTx,
+  processTxs,
 };

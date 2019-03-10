@@ -4,7 +4,7 @@ const Wallet = require('./wallet');
 const Transaction = require('./transaction');
 
 const { getBalance, getPublicFromWallet } = Wallet;
-const { createCoinbaseTx } = Transaction;
+const { createCoinbaseTx, processTxs } = Transaction;
 
 const BLOCK_GENERATION_INTERVAL = 10;
 const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
@@ -33,7 +33,7 @@ const genesisBlock = new Block(
 
 let blockChain = [genesisBlock];
 
-const uTxOuts = [];
+let uTxOuts = [];
 
 const getBlockChain = () => blockChain;
 
@@ -154,7 +154,13 @@ const replaceChain = (newChain) => {
 
 const addBlockToChain = (candidateBlock) => {
   if (isBlockValid(candidateBlock, getNewestBlock())) {
+    const processedTxs = processTxs(candidateBlock.data, uTxOuts, candidateBlock.index);
+    if (processedTxs === null) {
+      console.error('Couldn\'t process txs');
+      return false;
+    }
     getBlockChain().push(candidateBlock);
+    uTxOuts = processedTxs;
     return true;
   }
   return false;
