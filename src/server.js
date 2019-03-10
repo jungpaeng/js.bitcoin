@@ -91,7 +91,7 @@ app.get('/address/:address', (req, res) => {
 });
 
 const server = app.listen(PORT, () => {
-  console.log(`Coin Server running on ${PORT}`);
+  console.log(`Coin Server running on port: ${PORT}`);
 });
 
 initWallet();

@@ -42,7 +42,7 @@ const getTxId = (tx) => {
   const txOutContent = tx.txOuts
     .map(txOut => txOut.address + txOut.amount)
     .reduce((prev, curr) => prev + curr, '');
-  return CryptoJS.SHA256(txInContent + txOutContent).toString();
+  return CryptoJS.SHA256(txInContent + txOutContent + tx.timestamp).toString();
 };
 
 const findUTxOut = (txOutId, txOutIndex, uTxOutList) => (
@@ -96,15 +96,15 @@ const isTxInStructureValid = (txIn) => {
     return false;
   }
   if (typeof txIn.signature !== 'string') {
-    console.error('The txIn doesn\'t have a valid signature');
+    console.error("The txIn doesn't have a valid signature");
     return false;
   }
   if (typeof txIn.txOutId !== 'string') {
-    console.error('The txIn doesn\'t have a valid txOutId');
+    console.error("The txIn doesn't have a valid txOutId");
     return false;
   }
   if (typeof txIn.txOutIndex !== 'number') {
-    console.error('The txIn doesn\'t have a valid txOutIndex');
+    console.error("The txIn doesn't have a valid txOutIndex");
     return false;
   }
   return true;
@@ -116,11 +116,11 @@ const isAddressValid = (address) => {
     return false;
   }
   if (address.match('^[a-fA-F0-9]+$') === null) {
-    console.error('The address doesn\'t match the hex pattern');
+    console.error("The address doesn't match the hex pattern");
     return false;
   }
   if (!address.startsWith('04')) {
-    console.error('the address doesn\'t start with 04');
+    console.error("The address doesn't start with 04");
     return false;
   }
   return true;
@@ -131,15 +131,15 @@ const isTxOutStructureValid = (txOut) => {
     return false;
   }
   if (typeof txOut.address !== 'string') {
-    console.error('The txOut doesn\'t have a valid string as address');
+    console.error("The txOut doesn't have a valid string as address");
     return false;
   }
   if (!isAddressValid(txOut.address)) {
-    console.error('The txOut doesn\'t have a valid address');
+    console.error("The txOut doesn't have a valid address");
     return false;
   }
   if (typeof txOut.amount !== 'number') {
-    console.error('The txOut doesn\'t have a valid amount');
+    console.error("The txOut doesn't have a valid amount");
     return false;
   }
   return true;
@@ -183,7 +183,7 @@ const validateTxIn = (txIn, tx, uTxOutList) => {
   );
 
   if (wantedTxOut === undefined) {
-    console.error(`Didn't find the wanted uTxOut, the tx : ${tx} is invalid`);
+    console.error(`Didn't find the wanted uTxOut, the tx: ${tx} is invalid`);
     return false;
   }
 
@@ -223,10 +223,9 @@ const validateTx = (tx, uTxOutList) => {
     .reduce((prev, curr) => prev + curr, 0);
 
   if (amountInTxIns !== amountInTxOuts) {
-    console.error(`the tx: ${tx} doesn't have the same amount in the txOut as in the txIns`);
+    console.error(`The tx: ${tx} doesn't have the same amount in the txOut as in the txIns`);
     return false;
   }
-
   return true;
 };
 
@@ -251,7 +250,6 @@ const validateCoinbaseTx = (tx, blockIndex) => {
     console.error(`Coinbase TX should have an amount of only ${COINBASE_AMOUNT} and it has ${tx.txOuts[0].amount}`);
     return false;
   }
-
   return true;
 };
 

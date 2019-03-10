@@ -34,7 +34,7 @@ const genesisTx = {
       amount: 10,
     },
   ],
-  id: 'f58de87ffc6b9035ccca4fd271c302e0fcba55dfb96815134bf5f628e4a2193a',
+  id: 'c56c241bf782094ce497adf5e855b45478eb4cc6a81de83a81f8a97b427c47cc',
 };
 
 const genesisBlock = new Block(

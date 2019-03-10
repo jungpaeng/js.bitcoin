@@ -15,15 +15,14 @@ const { getMempool } = Mempool;
 const sockets = [];
 
 // Message Types
-const GET_LASTEST = 'GET_LASTEST';
+const GET_LATEST = 'GET_LATEST';
 const GET_ALL = 'GET_ALL';
 const BLOCKCHAIN_RESPONSE = 'BLOCKCHAIN_RESPONSE';
 const REQUEST_MEMPOOL = 'REQUEST_MEMPOOL';
 const MEMPOOL_RESPONSE = 'MEMPOOL_RESPONSE';
 
-// Message Creators
 const getLatest = () => ({
-  type: GET_LASTEST,
+  type: GET_LATEST,
   data: null,
 });
 
@@ -47,13 +46,11 @@ const mempoolResponse = data => ({
   data,
 });
 
-const getSockets = () => sockets;
-
 const parseData = (data) => {
   try {
     return JSON.parse(data);
   } catch (e) {
-    console.eror(e);
+    console.error(e);
     return null;
   }
 };
@@ -75,12 +72,12 @@ const broadcastMempool = () => sendMessageToAll(returnMempool());
 const handleBlockChainResponse = (receivedBlocks) => {
   if (receivedBlocks.length === 0) {
     console.log('Received blocks have a length of 0');
-    return null;
+    return;
   }
   const latestBlockReceived = receivedBlocks[receivedBlocks.length - 1];
   if (!isStructureValid(latestBlockReceived)) {
     console.log('The block structure of the block received is not valid');
-    return null;
+    return;
   }
   const newestBlock = getNewestBlock();
   if (latestBlockReceived.index > newestBlock.index) {
@@ -94,17 +91,16 @@ const handleBlockChainResponse = (receivedBlocks) => {
       replaceChain(receivedBlocks);
     }
   }
-  return null;
 };
 
 const handleSocketMessages = (ws) => {
   ws.on('message', (data) => {
     const message = parseData(data);
     if (message === null) {
-      return null;
+      return;
     }
     switch (message.type) {
-      case GET_LASTEST:
+      case GET_LATEST:
         sendMessage(ws, responseLatest());
         break;
       case GET_ALL:
@@ -126,7 +122,7 @@ const handleSocketMessages = (ws) => {
         {
           const receivedTxs = message.data;
           if (receivedTxs === null) {
-            return null;
+            return;
           }
           receivedTxs.forEach((tx) => {
             try {
@@ -139,9 +135,7 @@ const handleSocketMessages = (ws) => {
         }
         break;
       default:
-        return null;
     }
-    return null;
   });
 };
 
@@ -150,6 +144,7 @@ const handleSocketError = (ws) => {
     ws.close();
     sockets.splice(sockets.indexOf(ws), 1);
   };
+  ws.on('close', () => closeSocketConnection(ws));
   ws.on('error', () => closeSocketConnection(ws));
 };
 
