@@ -1,8 +1,10 @@
 const CryptoJS = require('crypto-js');
 const hexToBinary = require('hex-to-binary');
 const Wallet = require('./wallet');
+const Transaction = require('./transaction');
 
 const { getBalance, getPublicFromWallet } = Wallet;
+const { createCoinbaseTx } = Transaction;
 
 const BLOCK_GENERATION_INTERVAL = 10;
 const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
@@ -85,7 +87,7 @@ const isStructureValid = block => (
   && typeof block.hash === 'string'
   && typeof block.prevHash === 'string'
   && typeof block.timeStamp === 'number'
-  && typeof block.data === 'string'
+  && typeof block.data === 'object'
 );
 
 const isTimeStampValid = (newBlock, oldBlock) => (
@@ -180,7 +182,7 @@ const findDifficulty = () => {
   return newestBlock.difficulty;
 };
 
-const createNewBlock = (data) => {
+const createNewRawBlock = (data) => {
   const prevBlock = getNewestBlock();
   const newBlockIndex = prevBlock.index + 1;
   const newTimeStamp = getTimeStamp();
@@ -195,6 +197,12 @@ const createNewBlock = (data) => {
   addBlockToChain(newBlock);
   require('./p2p').broadcastNewBlock();
   return newBlock;
+};
+
+const createNewBlock = () => {
+  const coinbaseTx = createCoinbaseTx(getPublicFromWallet(), getNewestBlock().index + 1);
+  const blockData = [coinbaseTx];
+  return createNewRawBlock(blockData);
 };
 
 const getAccountBalance = () => getBalance(getPublicFromWallet(), uTxOuts);
