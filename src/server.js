@@ -8,10 +8,10 @@ const Wallet = require('./wallet');
 const Mempool = require('./mempool');
 
 const {
-  getBlockChain, createNewBlock, getAccountBalance, sendTx,
+  getBlockChain, createNewBlock, getAccountBalance, sendTx, getUTxOutList,
 } = BlockChain;
 const { startP2PServer, connectToPeers } = P2P;
-const { initWallet, getPublicFromWallet } = Wallet;
+const { initWallet, getPublicFromWallet, getBalance } = Wallet;
 const { getMempool } = Mempool;
 
 const PORT = process.env.HTTP_PORT || 3000;
@@ -55,6 +55,17 @@ app.get('/block/:hash', (req, res) => {
   }
 });
 
+app.get('/transactions/:id', (req, res) => {
+  const tx = _(getBlockChain())
+    .map(blocks => blocks.data)
+    .flatten()
+    .find({ id: req.params.id });
+  if (tx === undefined) {
+    res.status(400).send('Transaction not found');
+  }
+  res.send(tx);
+});
+
 app.route('/transactions')
   .get((req, res) => {
     res.send(getMempool());
@@ -72,6 +83,12 @@ app.route('/transactions')
       res.status(400).send(e.message);
     }
   });
+
+app.get('/address/:address', (req, res) => {
+  const { params: { address } } = req;
+  const balance = getBalance(address, getUTxOutList());
+  res.send({ balance });
+});
 
 const server = app.listen(PORT, () => {
   console.log(`Coin Server running on ${PORT}`);

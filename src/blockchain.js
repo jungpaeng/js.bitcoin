@@ -268,4 +268,5 @@ module.exports = {
   getAccountBalance,
   sendTx,
   handleIncomingTx,
+  getUTxOutList,
 };
