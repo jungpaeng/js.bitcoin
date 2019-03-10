@@ -5,6 +5,8 @@ const { validateTx } = Transaction;
 
 const mempool = [];
 
+const getMempool = () => _.cloneDeep(mempool);
+
 const getTxInsInPool = mempool => _(mempool)
   .map(tx => tx.txIns)
   .flatten()
@@ -37,4 +39,5 @@ const addToMempool = (tx, uTxOutList) => {
 
 module.exports = {
   addToMempool,
+  getMempool,
 };

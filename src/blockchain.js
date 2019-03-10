@@ -9,7 +9,7 @@ const {
   getBalance, getPublicFromWallet, getPrivateFromWallet, createTx,
 } = Wallet;
 const { createCoinbaseTx, processTxs } = Transaction;
-const { addToMempool } = Mempool;
+const { addToMempool, getMempool } = Mempool;
 
 const BLOCK_GENERATION_INTERVAL = 10;
 const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
@@ -214,7 +214,7 @@ const createNewRawBlock = (data) => {
 
 const createNewBlock = () => {
   const coinbaseTx = createCoinbaseTx(getPublicFromWallet(), getNewestBlock().index + 1);
-  const blockData = [coinbaseTx];
+  const blockData = [coinbaseTx].concat(getMempool());
   return createNewRawBlock(blockData);
 };
 
@@ -224,6 +224,7 @@ const sendTx = (address, amount) => {
   const uTxOutList = getUTxOutList();
   const tx = createTx(address, amount, getPrivateFromWallet(), uTxOutList);
   addToMempool(tx, uTxOutList);
+  return tx;
 };
 
 module.exports = {
