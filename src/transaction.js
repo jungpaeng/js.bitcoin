@@ -8,7 +8,9 @@ const ec = new EC('secp256k1');
 const COINBASE_AMOUNT = 10;
 
 class TxIn {
-  // TODO: txOutId, txOutIndex, Signature
+  // txOutId
+  // txOutIndex
+  // Signature
 }
 
 class TxOut {
@@ -19,7 +21,9 @@ class TxOut {
 }
 
 class Transaction {
-  // TODO: Id, txIns[], txOuts[]
+  // Id
+  // txIns[]
+  // txOuts[]
 }
 
 class UTxOut {
