@@ -54,9 +54,9 @@ const getPublicKey = privateKey => ec
 
 const signTxIn = (tx, txInIndex, privateKey, uTxOutList) => {
   const txIn = tx.txIns[txInIndex];
-  const referencedUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOutList);
-  if (referencedUTxOut === null) {
-    return null;
+  const referencedUTxOut = findUTxOut(txIn.txOutId, txIn.txOutIndex, uTxOutList);
+  if (referencedUTxOut === null || referencedUTxOut === undefined) {
+    throw Error("Couldn't find the referenced uTxOut, not signing");
   }
   const referencedAddress = referencedUTxOut.address;
   if (getPublicKey(privateKey) !== referencedAddress) {

@@ -5,7 +5,9 @@ const BlockChain = require('./blockchain');
 const P2P = require('./p2p');
 const Wallet = require('./wallet');
 
-const { getBlockChain, createNewBlock, getAccountBalance } = BlockChain;
+const {
+  getBlockChain, createNewBlock, getAccountBalance, sendTx,
+} = BlockChain;
 const { startP2PServer, connectToPeers } = P2P;
 const { initWallet } = Wallet;
 
@@ -35,6 +37,24 @@ app.get('/me/balance', (req, res) => {
   const balance = getAccountBalance();
   res.send({ balance });
 });
+
+app.route('/transactions')
+  .get((req, res) => {
+
+  })
+  .post((req, res) => {
+    try {
+      const { body: { address, amount } } = req;
+      if (address === undefined || amount === undefined) {
+        throw Error('Please specify and address and an amount');
+      } else {
+        const resPonse = sendTx(address, amount);
+        res.send(resPonse);
+      }
+    } catch (e) {
+      res.status(400).send(e.message);
+    }
+  });
 
 const server = app.listen(PORT, () => {
   console.log(`Coin Server running on ${PORT}`);

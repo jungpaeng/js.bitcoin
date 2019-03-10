@@ -234,4 +234,5 @@ module.exports = {
   addBlockToChain,
   replaceChain,
   getAccountBalance,
+  sendTx,
 };

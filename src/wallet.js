@@ -55,8 +55,7 @@ const findAmountInUTxOuts = (amountNeeaded, myUTxOuts) => {
       return { includedUTxOuts, leftOverAmount };
     }
   }
-  console.error('Not enough founds');
-  return false;
+  throw Error('Not enough founds');
 };
 
 const createTxOut = (receiverAddress, myAddress, amount, leftOverAmount) => {
@@ -77,6 +76,7 @@ const createTx = (receiverAddress, amount, privateKey, uTxOutList) => {
     const txIn = new TxIn();
     txIn.txOutId = uTxOut.txOutId;
     txIn.txOutIndex = uTxOut.txOutIndex;
+    return txIn;
   };
 
   const uTxIns = includedUTxOuts.map(toUTxIn);
