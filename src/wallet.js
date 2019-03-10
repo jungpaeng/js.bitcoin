@@ -41,17 +41,17 @@ const initWallet = () => {
   }
 };
 
-const findAmountInUTxOuts = (amountNeeaded, myUTxOuts) => {
+const findAmountInUTxOuts = (amountNeeded, myUTxOuts) => {
   let currentAmount = 0;
   const includedUTxOuts = [];
 
-  for (let index = 0; index < myUTxOuts.length; index + 1) {
+  for (let index = 0; index < myUTxOuts.length; index += 1) {
     const myUTxOut = myUTxOuts[index];
     includedUTxOuts.push(myUTxOut);
     currentAmount += myUTxOut.amount;
 
-    if (currentAmount >= amountNeeaded) {
-      const leftOverAmount = currentAmount - amountNeeaded;
+    if (currentAmount >= amountNeeded) {
+      const leftOverAmount = currentAmount - amountNeeded;
       return { includedUTxOuts, leftOverAmount };
     }
   }
