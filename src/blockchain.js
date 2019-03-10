@@ -68,7 +68,7 @@ const createHash = (index, prevHash, timeStamp, data, difficulty, nonce) => Cryp
   + nonce,
 ).toString();
 
-const hashMatchedDifficulty = (hash, difficulty) => {
+const hashMatchedDifficulty = (hash, difficulty = 0) => {
   const hashInBinary = hexToBinary(hash);
   const requiredZeros = '0'.repeat(difficulty);
   console.log('Trying difficulty: ', difficulty, 'with hash', hexToBinary(hash));
