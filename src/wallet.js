@@ -65,7 +65,7 @@ const createTxOut = (receiverAddress, myAddress, amount, leftOverAmount) => {
     return [receiverTxOut];
   }
   const leftOverTxOut = new TxOut(myAddress, leftOverAmount);
-  return [receiverTxOut, leftOverAmount];
+  return [receiverTxOut, leftOverTxOut];
 };
 
 const createTx = (receiverAddress, amount, privateKey, uTxOutList) => {
