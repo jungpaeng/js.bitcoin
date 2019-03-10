@@ -131,6 +131,7 @@ const handleSocketMessages = (ws) => {
           receivedTxs.forEach((tx) => {
             try {
               handleIncomingTx(tx);
+              broadcastMempool();
             } catch (e) {
               console.error(e);
             }

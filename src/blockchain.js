@@ -143,14 +143,23 @@ const isChainValid = (candidateChain) => {
   );
   if (!isGenesisValid(candidateChain[0])) {
     console.error('The candidateChain\'s genesisBlock is not same as our genesisBlock');
-    return false;
+    return null;
   }
-  for (let i = 1; i < candidateChain.length; i += 1) {
-    if (!isBlockValid(candidateChain[i], candidateChain[i - 1])) {
-      return false;
+
+  let foreignUTxOuts = [];
+
+  for (let i = 0; i < candidateChain.length; i += 1) {
+    const currentBlock = candidateChain[i];
+    if (i !== 0 && !isBlockValid(currentBlock, candidateChain[i - 1])) {
+      return null;
+    }
+
+    foreignUTxOuts = processTxs(currentBlock.data, foreignUTxOuts, currentBlock.index);
+    if (foreignUTxOuts === null) {
+      return null;
     }
   }
-  return true;
+  return foreignUTxOuts;
 };
 
 const sumOfiDifficulty = anyBlockChain => (
@@ -159,12 +168,17 @@ const sumOfiDifficulty = anyBlockChain => (
     .reduce((prev, curr) => prev + curr)
 );
 
-const replaceChain = (newChain) => {
+const replaceChain = (candidateChain) => {
+  const foreignUTxOuts = isChainValid(candidateChain);
+  const validChain = foreignUTxOuts !== null;
   if (
-    isChainValid(newChain)
-    && sumOfiDifficulty(newChain) > sumOfiDifficulty(getBlockChain())
+    validChain
+    && sumOfiDifficulty(candidateChain) > sumOfiDifficulty(getBlockChain())
   ) {
-    blockChain = newChain;
+    blockChain = candidateChain;
+    uTxOuts = foreignUTxOuts;
+    updateMempool(uTxOuts);
+    require('./p2p').broadcastNewBlock();
     return true;
   }
   return false;
