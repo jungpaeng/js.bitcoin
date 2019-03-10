@@ -7,7 +7,7 @@ const ec = new EC('secp256k1');
 const COINBASE_AMOUNT = 10;
 
 class TxIn {
-  // TODO: uTxOutId, uTxOutIndex, Signature
+  // TODO: txOutId, txOutIndex, Signature
 }
 
 class TxOut {
@@ -250,4 +250,13 @@ const validateCoinbaseTx = (tx, blockIndex) => {
   }
 
   return true;
+};
+
+module.exports = {
+  Transaction,
+  TxIn,
+  TxOut,
+  getPublicKey,
+  getTxId,
+  signTxIn,
 };
