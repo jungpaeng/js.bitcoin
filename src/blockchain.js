@@ -40,7 +40,7 @@ const genesisTx = {
 const genesisBlock = new Block(
   0,
   '33156b8dcba9314966c2cbd5578d1f646bafc6da42ba6cc35c9f1aa019e01802',
-  null,
+  '',
   1552058917,
   [genesisTx],
   0,
@@ -71,7 +71,7 @@ const createHash = (index, prevHash, timeStamp, data, difficulty, nonce) => Cryp
 const hashMatchedDifficulty = (hash, difficulty = 0) => {
   const hashInBinary = hexToBinary(hash);
   const requiredZeros = '0'.repeat(difficulty);
-  console.log('Trying difficulty: ', difficulty, 'with hash', hexToBinary(hash));
+  console.log('Trying difficulty: ', difficulty, 'with hash ', hashInBinary);
   return hashInBinary.startsWith(requiredZeros);
 };
 
@@ -119,7 +119,7 @@ const isBlockValid = (candidateBlock, latestBlock) => {
     return false;
   }
   if (latestBlock.index + 1 !== candidateBlock.index) {
-    console.error('The candidate block doesn\'t have a valid index');
+    console.error("The candidate block doesn't have a valid index");
     return false;
   }
   if (latestBlock.hash !== candidateBlock.prevHash) {
@@ -127,11 +127,11 @@ const isBlockValid = (candidateBlock, latestBlock) => {
     return false;
   }
   if (getBlockHash(candidateBlock) !== candidateBlock.hash) {
-    console.error('The hash of the block is invalid');
+    console.error('The hash of this block is invalid');
     return false;
   }
   if (!isTimeStampValid(candidateBlock, latestBlock)) {
-    console.error('The time stamp of this block is doggy');
+    console.error('The time stamp of this block is dodgy');
     return false;
   }
   return true;
@@ -142,7 +142,7 @@ const isChainValid = (candidateChain) => {
     JSON.stringify(block) === JSON.stringify(genesisBlock)
   );
   if (!isGenesisValid(candidateChain[0])) {
-    console.error('The candidateChain\'s genesisBlock is not same as our genesisBlock');
+    console.error("The candidateChains's genesisBlock is not same as our genesisBlock");
     return null;
   }
 
@@ -164,7 +164,8 @@ const isChainValid = (candidateChain) => {
 
 const sumOfiDifficulty = anyBlockChain => (
   anyBlockChain
-    .map(block => block.difficulty ** 2)
+    .map(block => block.difficulty)
+    .map(difficulty => 2 ** difficulty)
     .reduce((prev, curr) => prev + curr)
 );
 
@@ -188,10 +189,10 @@ const addBlockToChain = (candidateBlock) => {
   if (isBlockValid(candidateBlock, getNewestBlock())) {
     const processedTxs = processTxs(candidateBlock.data, uTxOuts, candidateBlock.index);
     if (processedTxs === null) {
-      console.error('Couldn\'t process txs');
+      console.error("Couldn't process txs");
       return false;
     }
-    getBlockChain().push(candidateBlock);
+    blockChain.push(candidateBlock);
     uTxOuts = processedTxs;
     updateMempool(uTxOuts);
     return true;
@@ -203,7 +204,7 @@ const calculateNewDifficulty = (newestBlock, blockChain) => {
   const lastCalculatedBlock = blockChain[blockChain.length - DIFFICULTY_ADJUSMENT_INTERVAL];
   const timeExpected = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSMENT_INTERVAL;
   const timeTaken = newestBlock.timeStamp - lastCalculatedBlock.timeStamp;
-  if (timeTaken > timeExpected / 2) {
+  if (timeTaken > timeExpected * 2) {
     return lastCalculatedBlock.difficulty - 1;
   }
   if (timeTaken < timeExpected / 2) {
@@ -214,7 +215,6 @@ const calculateNewDifficulty = (newestBlock, blockChain) => {
 
 const findDifficulty = () => {
   const newestBlock = getNewestBlock();
-
   if (newestBlock.index % DIFFICULTY_ADJUSMENT_INTERVAL === 0 && newestBlock.index !== 0) {
     return calculateNewDifficulty(newestBlock, getBlockChain());
   }
