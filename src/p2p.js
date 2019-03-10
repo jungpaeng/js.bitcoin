@@ -159,7 +159,12 @@ const initSocketConnection = (ws) => {
   handleSocketError(ws);
   sendMessage(ws, getLatest());
   setTimeout(() => {
-    sendMessage(ws, getAllMempool());
+    sendMessageToAll(ws, getAllMempool());
+  }, 1000);
+  setInterval(() => {
+    if (sockets.includes(ws)) {
+      sendMessage(ws, '');
+    }
   }, 1000);
 };
 
