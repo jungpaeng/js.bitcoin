@@ -264,6 +264,9 @@ const createCoinbaseTx = (address, blockIndex) => {
   tx.txIns = [txIn];
   tx.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
   tx.id = getTxId(tx);
+  tx.amount = 10;
+  tx.to = address;
+  tx.from = 'COINBASE';
   return tx;
 };
 
