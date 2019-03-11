@@ -10,7 +10,7 @@ const Wallet = require('./wallet');
 const Mempool = require('./mempool');
 
 const {
-  getBlockChain, createNewBlock, getAccountBalance, sendTx, getUTxOutList, myUTxOuts,
+  getBlockChain, createNewBlock, createNewBlockWithTx, getAccountBalance, sendTx, getUTxOutList, myUTxOuts,
 } = BlockChain;
 const { startP2PServer, connectToPeers } = P2P;
 const { initWallet, getPublicFromWallet } = Wallet;
@@ -144,9 +144,8 @@ app.post('/mineTransaction', (req, res) => {
   const { address, amount } = req.body;
 
   try {
-    // TODO
-    // const response = createNewBlockWithTx(address, amount);
-    // res.send(response);
+    const response = createNewBlockWithTx(address, amount);
+    res.send(response);
   } catch (e) {
     res.status(400).send(e.message);
   }

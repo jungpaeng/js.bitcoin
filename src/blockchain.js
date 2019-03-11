@@ -8,7 +8,7 @@ const Mempool = require('./mempool');
 const {
   getBalance, getPublicFromWallet, getPrivateFromWallet, createTx, findUTxOuts,
 } = Wallet;
-const { createCoinbaseTx, processTxs } = Transaction;
+const { isAddressValid, createCoinbaseTx, processTxs } = Transaction;
 const { addToMempool, getMempool, updateMempool } = Mempool;
 
 const BLOCK_GENERATION_INTERVAL = 10;
@@ -238,6 +238,31 @@ const createNewRawBlock = (data) => {
   return newBlock;
 };
 
+// Create a new block with a transaction on it
+const createNewBlockWithTx = (receiverAddress, amount) => {
+  if (!isAddressValid(receiverAddress)) {
+    throw Error('Address is invalid');
+  } else if (typeof amount !== 'number') {
+    throw Error('Amount is invalid');
+  }
+
+  const coinbaseTx = createCoinbaseTx(
+    getPublicFromWallet(),
+    getNewestBlock().index + 1,
+  );
+
+  const tx = createTx(
+    receiverAddress,
+    amount,
+    getPrivateFromWallet(),
+    uTxOuts,
+    getMempool(),
+  );
+
+  const blockData = [coinbaseTx, tx];
+  return createNewRawBlock(blockData);
+};
+
 const createNewBlock = () => {
   const coinbaseTx = createCoinbaseTx(getPublicFromWallet(), getNewestBlock().index + 1);
   const blockData = [coinbaseTx].concat(getMempool());
@@ -265,6 +290,7 @@ module.exports = {
   getBlockChain,
   getNewestBlock,
   createNewBlock,
+  createNewBlockWithTx,
   isStructureValid,
   addBlockToChain,
   replaceChain,
