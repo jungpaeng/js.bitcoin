@@ -21,6 +21,9 @@ class TxOut {
 }
 
 class Transaction {
+  constructor() {
+    this.timeStamp = Math.round(new Date().getTime / 1000);
+  }
   // Id
   // txIns[]
   // txOuts[]
@@ -42,7 +45,7 @@ const getTxId = (tx) => {
   const txOutContent = tx.txOuts
     .map(txOut => txOut.address + txOut.amount)
     .reduce((prev, curr) => prev + curr, '');
-  return CryptoJS.SHA256(txInContent + txOutContent + tx.timestamp).toString();
+  return CryptoJS.SHA256(txInContent + txOutContent + tx.timeStamp).toString();
 };
 
 const findUTxOut = (txOutId, txOutIndex, uTxOutList) => (
