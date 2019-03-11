@@ -98,3 +98,5 @@ const server = app.listen(PORT, () => {
 
 initWallet();
 startP2PServer(server);
+
+process.on('unhandledRejection', err => console.error('unhandled', err));
