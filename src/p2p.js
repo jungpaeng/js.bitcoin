@@ -95,54 +95,58 @@ const handleBlockChainResponse = (receivedBlocks) => {
 
 const handleSocketMessages = (ws) => {
   ws.on('message', (data) => {
-    const message = parseData(data);
-    if (message === null) {
-      return;
-    }
-    switch (message.type) {
-      case GET_LATEST:
-        sendMessage(ws, responseLatest());
-        break;
-      case GET_ALL:
-        sendMessage(ws, responseAll());
-        break;
-      case BLOCKCHAIN_RESPONSE:
-        {
-          const receivedBlocks = message.data;
-          if (receivedBlocks === null) {
-            break;
-          }
-          handleBlockChainResponse(receivedBlocks);
-        }
-        break;
-      case REQUEST_MEMPOOL:
-        sendMessage(ws, returnMempool());
-        break;
-      case MEMPOOL_RESPONSE:
-        {
-          const receivedTxs = message.data;
-          if (receivedTxs === null) {
-            return;
-          }
-          receivedTxs.forEach((tx) => {
-            try {
-              handleIncomingTx(tx);
-              broadcastMempool();
-            } catch (e) {
-              console.error(e);
+    try {
+      const message = parseData(data);
+      if (message === null) {
+        return;
+      }
+      switch (message.type) {
+        case GET_LATEST:
+          sendMessage(ws, responseLatest());
+          break;
+        case GET_ALL:
+          sendMessage(ws, responseAll());
+          break;
+        case BLOCKCHAIN_RESPONSE:
+          {
+            const receivedBlocks = message.data;
+            if (receivedBlocks === null) {
+              break;
             }
-          });
-        }
-        break;
-      default:
+            handleBlockChainResponse(receivedBlocks);
+          }
+          break;
+        case REQUEST_MEMPOOL:
+          sendMessage(ws, returnMempool());
+          break;
+        case MEMPOOL_RESPONSE:
+          {
+            const receivedTxs = message.data;
+            if (receivedTxs === null) {
+              return;
+            }
+            receivedTxs.forEach((tx) => {
+              try {
+                handleIncomingTx(tx);
+                broadcastMempool();
+              } catch (e) {
+                console.error(e);
+              }
+            });
+          }
+          break;
+        default:
+      }
+    } catch (e) {
+      console.error(e);
     }
   });
 };
 
 const handleSocketError = (ws) => {
-  const closeSocketConnection = (ws) => {
-    ws.close();
-    sockets.splice(sockets.indexOf(ws), 1);
+  const closeSocketConnection = (closedWs) => {
+    closedWs.close();
+    sockets.splice(sockets.indexOf(closedWs), 1);
   };
   ws.on('close', () => closeSocketConnection(ws));
   ws.on('error', () => closeSocketConnection(ws));
@@ -179,8 +183,8 @@ const connectToPeers = (newPeer) => {
   ws.on('open', () => {
     initSocketConnection(ws);
   });
+  ws.on('close', () => console.error('Close'));
   ws.on('error', () => console.error('Connection failed'));
-  ws.on('close', () => console.error('Connection failed'));
 };
 
 module.exports = {
