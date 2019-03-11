@@ -114,6 +114,9 @@ const createTx = (receiverAddress, amount, privateKey, uTxOutList, mempool) => {
     txIn.signature = signTxIn(tx, index, privateKey, uTxOutList);
     return txIn;
   });
+  tx.amount = amount;
+  tx.from = myAddress;
+  tx.to = receiverAddress;
 
   return tx;
 };
