@@ -283,6 +283,7 @@ const validateBlockTxs = (txs, uTxOutList, blockIndex) => {
   const coinbaseTx = txs[0];
   if (!validateCoinbaseTx(coinbaseTx, blockIndex)) {
     console.error('Coinbase Tx is invalid');
+    return false;
   }
 
   const txIns = _(txs)
@@ -298,7 +299,7 @@ const validateBlockTxs = (txs, uTxOutList, blockIndex) => {
   const nonCoinbaseTxs = txs.slice(1);
   return nonCoinbaseTxs
     .map(tx => validateTx(tx, uTxOutList))
-    .reduce((prev, curr) => prev + curr, true);
+    .reduce((prev, curr) => prev && curr, true);
 };
 
 const processTxs = (txs, uTxOutList, blockIndex) => {
