@@ -29,11 +29,17 @@ const getPublicFromWallet = () => {
   return key.getPublic().encode('hex');
 };
 
-const getBalance = (address, uTxOuts) => _(uTxOuts)
-  .filter(uTxO => uTxO.address === address)
-  .map(uTxO => uTxO.amount)
-  .sum();
+const findUTxOuts = (address, uTxOuts) => _.filter(
+  uTxOuts,
+  uTxOut => uTxOut.address === address,
+);
 
+const getBalance = (address, uTxOuts) => (
+  _(findUTxOuts(address, uTxOuts))
+    .filter(uTxO => uTxO.address === address)
+    .map(uTxO => uTxO.amount)
+    .sum()
+);
 const initWallet = () => {
   if (!fs.existsSync(privateKeyLocation)) {
     const newPrivateKey = generatePrivateKey();
