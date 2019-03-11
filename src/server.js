@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
+const paginate = require('paginate-array');
 const _ = require('lodash');
 const BlockChain = require('./blockchain');
 const P2P = require('./p2p');
@@ -33,7 +34,6 @@ app.post('/peers', (req, res) => {
 app.get('/blocks', (req, res) => {
   const page = req.query.page || 1;
   const reverseBlockChain = _(getBlockChain()).cloneDeep().reverse();
-  // TODO: yarn add paginate(paginate-array)
   const paginateBlockChain = paginate(reverseBlockChain, page, PAGE_UNIT_LENGTH);
   res.send(paginateBlockChain);
 });
@@ -53,7 +53,7 @@ app.get('/blocks/:index', (req, res) => {
   res.send(block);
 });
 
-app.post('mine', (req, res) => {
+app.post('/mine', (req, res) => {
   const newBlock = createNewBlock();
   res.send(newBlock);
 });
@@ -82,7 +82,6 @@ app.route('/transactions')
       .flatten()
       .reverse()
       .value();
-    // TODO: yarn add paginate(paginate-array)
     const paginateTxs = paginate(txs, page, PAGE_UNIT_LENGTH);
     res.send(paginateTxs);
   })
