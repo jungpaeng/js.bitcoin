@@ -207,7 +207,9 @@ const validateTx = (tx, uTxOutList) => {
     return false;
   }
 
-  const hasValidTxIns = tx.txIns.map(txIn => validateTxIn(txIn, tx, uTxOutList));
+  const hasValidTxIns = tx.txIns
+    .map(txIn => validateTxIn(txIn, tx, uTxOutList))
+    .reduce((prev, curr) => prev && curr, true);
 
   if (!hasValidTxIns) {
     console.error(`The tx: ${tx} doesn't have valid txIns`);
