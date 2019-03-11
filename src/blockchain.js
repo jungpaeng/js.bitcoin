@@ -40,7 +40,7 @@ const genesisTx = {
   amount: 10,
   timeStamp: 1552058917,
   to: '042c08776955fc93c81bf4aa2e67337142ff35a6925f278c31ba1e66291774e75a61b376a85e78ebac31b177e711c2a6814c141ba6b56a048eab54a3f53b6f0a4d',
-  id: 'c56c241bf782094ce497adf5e855b45478eb4cc6a81de83a81f8a97b427c47cc',
+  id: 'e55d4adf1099126d7cbe77b9005a4320afe9a0f278b2df725e54493b3f653a1d',
 };
 
 const genesisBlock = new Block(
