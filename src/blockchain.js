@@ -6,7 +6,7 @@ const Transaction = require('./transaction');
 const Mempool = require('./mempool');
 
 const {
-  getBalance, getPublicFromWallet, getPrivateFromWallet, createTx,
+  getBalance, getPublicFromWallet, getPrivateFromWallet, createTx, findUTxOuts,
 } = Wallet;
 const { createCoinbaseTx, processTxs } = Transaction;
 const { addToMempool, getMempool, updateMempool } = Mempool;
@@ -254,6 +254,9 @@ const sendTx = (address, amount) => {
   return tx;
 };
 
+// Get myUtxOuts
+const myUTxOuts = () => findUTxOuts(getPublicFromWallet(), getUTxOutList());
+
 const handleIncomingTx = (tx) => {
   addToMempool(tx, getUTxOutList());
 };
@@ -269,4 +272,5 @@ module.exports = {
   sendTx,
   handleIncomingTx,
   getUTxOutList,
+  myUTxOuts,
 };
