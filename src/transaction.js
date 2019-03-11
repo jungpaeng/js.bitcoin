@@ -178,11 +178,11 @@ const isTxStructureValid = (tx) => {
 };
 
 const validateTxIn = (txIn, tx, uTxOutList) => {
-  const wantedTxOut = uTxOutList.find(
-    uTxOut => uTxOut.txOutId === txIn.txOutId && uTxOut.txOutIndex === txIn.txOutIndex,
-  );
+  const wantedTxOut = uTxOutList.find(uTxOut => (
+    uTxOut.txOutId === txIn.txOutId && uTxOut.txOutIndex === txIn.txOutIndex
+  ));
 
-  if (wantedTxOut === undefined) {
+  if (wantedTxOut === null || wantedTxOut === undefined) {
     console.error(`Didn't find the wanted uTxOut, the tx: ${tx} is invalid`);
     return false;
   }
