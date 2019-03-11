@@ -133,4 +133,5 @@ module.exports = {
   getPublicFromWallet,
   getPrivateFromWallet,
   createTx,
+  findUTxOuts,
 };
