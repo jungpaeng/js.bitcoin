@@ -22,7 +22,7 @@ class TxOut {
 
 class Transaction {
   constructor() {
-    this.timeStamp = Math.round(new Date().getTime / 1000);
+    this.timeStamp = Math.round(new Date().getTime() / 1000);
   }
   // Id
   // txIns[]
