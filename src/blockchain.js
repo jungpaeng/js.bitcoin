@@ -23,6 +23,9 @@ class Block {
     this.data = data;
     this.difficulty = difficulty;
     this.nonce = nonce;
+    this.amount = _(data)
+      .map(tx => tx.amount)
+      .reduce((a, b) => a + b);
   }
 }
 
@@ -34,6 +37,9 @@ const genesisTx = {
       amount: 10,
     },
   ],
+  amount: 10,
+  timeStamp: 1552058917,
+  to: '042c08776955fc93c81bf4aa2e67337142ff35a6925f278c31ba1e66291774e75a61b376a85e78ebac31b177e711c2a6814c141ba6b56a048eab54a3f53b6f0a4d',
   id: 'c56c241bf782094ce497adf5e855b45478eb4cc6a81de83a81f8a97b427c47cc',
 };
 
@@ -50,6 +56,10 @@ const genesisBlock = new Block(
 let blockChain = [genesisBlock];
 
 let uTxOuts = processTxs(blockChain[0].data, [], 0);
+
+const updateUTxOutsList = (newUTxOuts) => {
+  uTxOuts = newUTxOuts;
+};
 
 const getUTxOutList = () => _.cloneDeep(uTxOuts);
 
@@ -177,8 +187,8 @@ const replaceChain = (candidateChain) => {
     && sumOfiDifficulty(candidateChain) > sumOfiDifficulty(getBlockChain())
   ) {
     blockChain = candidateChain;
-    uTxOuts = foreignUTxOuts;
-    updateMempool(uTxOuts);
+    updateUTxOutsList(foreignUTxOuts);
+    updateMempool(getUTxOutList());
     require('./p2p').broadcastNewBlock();
     return true;
   }
@@ -193,7 +203,7 @@ const addBlockToChain = (candidateBlock) => {
       return false;
     }
     blockChain.push(candidateBlock);
-    uTxOuts = processedTxs;
+    updateUTxOutsList(processedTxs);
     updateMempool(uTxOuts);
     return true;
   }
@@ -204,7 +214,7 @@ const calculateNewDifficulty = (newestBlock, blockChain) => {
   const lastCalculatedBlock = blockChain[blockChain.length - DIFFICULTY_ADJUSMENT_INTERVAL];
   const timeExpected = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSMENT_INTERVAL;
   const timeTaken = newestBlock.timeStamp - lastCalculatedBlock.timeStamp;
-  if (timeTaken > timeExpected * 2) {
+  if (timeTaken > timeExpected * 2 && lastCalculatedBlock.difficulty !== 0) {
     return lastCalculatedBlock.difficulty - 1;
   }
   if (timeTaken < timeExpected / 2) {
@@ -233,9 +243,11 @@ const createNewRawBlock = (data) => {
     data,
     difficulty,
   );
-  addBlockToChain(newBlock);
-  require('./p2p').broadcastNewBlock();
-  return newBlock;
+  if (addBlockToChain(newBlock)) {
+    require('./p2p').broadcastNewBlock();
+    return newBlock;
+  }
+  return null;
 };
 
 // Create a new block with a transaction on it
