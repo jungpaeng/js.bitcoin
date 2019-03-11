@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const cors = require('cors');
 const _ = require('lodash');
 const BlockChain = require('./blockchain');
 const P2P = require('./p2p');
@@ -19,6 +20,7 @@ const PORT = process.env.HTTP_PORT || 3000;
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cors());
 app.use(morgan('combined'));
 
 app.route('/block')
