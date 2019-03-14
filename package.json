@@ -26,6 +26,11 @@
     "prettier-eslint": "^8.8.2"
   },
   "scripts": {
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "engines": {
+    "node": "10.15.2",
+    "npm": "6.x"
   }
 }
