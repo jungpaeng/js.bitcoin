@@ -16,7 +16,7 @@ const { startP2PServer, connectToPeers } = P2P;
 const { initWallet, getPublicFromWallet } = Wallet;
 const { getMempool } = Mempool;
 
-const PORT = process.env.HTTP_PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 const PAGE_UNIT_LENGTH = 15;
 
