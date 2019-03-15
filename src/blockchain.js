@@ -41,6 +41,7 @@ const genesisTx = {
   timeStamp: 1552058917,
   to: '042c08776955fc93c81bf4aa2e67337142ff35a6925f278c31ba1e66291774e75a61b376a85e78ebac31b177e711c2a6814c141ba6b56a048eab54a3f53b6f0a4d',
   id: 'e55d4adf1099126d7cbe77b9005a4320afe9a0f278b2df725e54493b3f653a1d',
+  from: 'COINBASE',
 };
 
 const genesisBlock = new Block(
