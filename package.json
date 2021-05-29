@@ -20,7 +20,7 @@
     "lodash": "^4.17.11",
     "morgan": "^1.9.1",
     "paginate-array": "^2.1.0",
-    "ws": "^6.1.4"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "prettier-eslint": "^8.8.2"
